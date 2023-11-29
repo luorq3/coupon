@@ -9,6 +9,7 @@ import com.geekbang.coupon.customer.api.beans.SearchCoupon;
 import com.geekbang.coupon.customer.api.enums.CouponStatus;
 import com.geekbang.coupon.customer.dao.CouponDao;
 import com.geekbang.coupon.customer.dao.entity.Coupon;
+import com.geekbang.coupon.customer.feign.CalculationService;
 import com.geekbang.coupon.customer.feign.TemplateService;
 import com.geekbang.coupon.customer.service.intf.CouponCustomerService;
 import com.geekbang.coupon.template.api.beans.CouponInfo;
@@ -20,7 +21,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.transaction.Transactional;
 import java.util.Calendar;
@@ -37,10 +37,10 @@ public class CouponCustomerServiceImpl implements CouponCustomerService {
     private CouponDao couponDao;
 
     @Autowired
-    private WebClient.Builder webClientBuilder;
+    private TemplateService templateService;
 
     @Autowired
-    private TemplateService templateService;
+    private CalculationService calculationService;
 
 
     @Override
@@ -69,12 +69,7 @@ public class CouponCustomerServiceImpl implements CouponCustomerService {
         order.setCouponInfos(couponInfos);
 
         // 调用接口试算服务
-        return webClientBuilder.build().post()
-                .uri("http://coupon-calculation-serv/calculator/simulate")
-                .bodyValue(order)
-                .retrieve()
-                .bodyToMono(SimulationResponse.class)
-                .block();
+        return calculationService.simulate(order);
     }
 
     /**
@@ -172,12 +167,7 @@ public class CouponCustomerServiceImpl implements CouponCustomerService {
         }
 
         // order清算
-        ShoppingCart checkoutInfo = webClientBuilder.build().post()
-                .uri("http://coupon-calculation-serv/calculator/checkout")
-                .bodyValue(order)
-                .retrieve()
-                .bodyToMono(ShoppingCart.class)
-                .block();
+        ShoppingCart checkoutInfo = calculationService.calculateOrderPrice(order);
 
         if (coupon != null) {
             // 如果优惠券没有被结算掉，而用户传递了优惠券，报错提示该订单满足不了优惠条件
@@ -195,11 +185,7 @@ public class CouponCustomerServiceImpl implements CouponCustomerService {
     }
 
     private CouponTemplateInfo loadTemplateInfo(Long templateId) {
-        return webClientBuilder.build().get()
-                .uri("http://coupon-template-serv/template/getTemplate?id=" + templateId)
-                .retrieve()
-                .bodyToMono(CouponTemplateInfo.class)
-                .block();
+        return templateService.getTemplate(templateId);
     }
 
     // 逻辑删除优惠券
