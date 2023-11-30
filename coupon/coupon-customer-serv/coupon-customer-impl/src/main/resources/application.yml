@@ -11,7 +11,7 @@ spring:
     # mysql数据源
     username: root
     password: 123456
-    url: jdbc:mysql://127.0.0.1:3306/geekbang_coupon_db?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC
+    url: jdbc:mysql://8.134.199.133:3306/geekbang_coupon_db?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     # 连接池
@@ -36,7 +36,7 @@ spring:
     nacos:
       discovery:
         # Nacos的服务注册地址，可以配置多个，逗号分隔
-        server-addr: localhost:8848
+        server-addr: 8.134.199.133:8848
         # 服务注册到Nacos上的名称，一般不用配置
         service: coupon-customer-serv
         # nacos客户端向服务端发送心跳的时间间隔，时间单位其实是ms
