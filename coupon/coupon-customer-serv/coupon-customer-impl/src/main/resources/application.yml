@@ -34,9 +34,6 @@ spring:
     open-in-view: false
   cloud:
     nacos:
-      config:
-        server-addr: 8.134.199.133:8848
-        file-extension: yaml
       discovery:
         # Nacos的服务注册地址，可以配置多个，逗号分隔
         server-addr: 8.134.199.133:8848
